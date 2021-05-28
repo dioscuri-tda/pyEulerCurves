@@ -113,8 +113,9 @@ kwargs = dict(
     zip_safe=False,
     packages=['pyEulerCurves'],
     install_requires=[
-    "numpy >= 1.19.2",
-    "matplotlib >= 3.3"
+    "numpy >= 1.19",
+    "matplotlib >= 3.3",
+    "sklearn >= 0.23"
     ]
 )
 
