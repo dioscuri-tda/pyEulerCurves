@@ -115,7 +115,7 @@ kwargs = dict(
     install_requires=[
     "numpy >= 1.19",
     "matplotlib >= 3.3",
-    "sklearn >= 0.23"
+    "scikit-learn >= 0.23"
     ]
 )
 
