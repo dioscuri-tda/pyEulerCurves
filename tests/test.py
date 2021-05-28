@@ -1,2 +1,2 @@
 import pyEulerCurves
-assert pyEulerCurves.__version__ == "0.1"
+assert 1 == 1
