@@ -102,27 +102,23 @@ class CMakeBuild(build_ext):
 from subprocess import CalledProcessError
 
 kwargs = dict(
-    name='pyEulerCurves',
-    version='0.1',
-    author='Davide Gurnari',
-    author_email='davide.gurnari@gmail.com',
-    description='A test project using pybind11 and CMake',
-    long_description='',
-    ext_modules=[CMakeExtension('pyEulerCurves._compute_local_EC_VR')],
+    name="pyEulerCurves",
+    version="0.1",
+    author="Davide Gurnari",
+    author_email="davide.gurnari@gmail.com",
+    description="A test project using pybind11 and CMake",
+    long_description="",
+    ext_modules=[CMakeExtension("pyEulerCurves._compute_local_EC_VR")],
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
     packages=['pyEulerCurves'],
-    install_requires=[
-    "numpy >= 1.19",
-    "matplotlib >= 3.3",
-    "scikit-learn >= 0.23"
-    ]
+    install_requires=["numpy >= 1.19","matplotlib >= 3.3","scikit-learn >= 0.23"]
 )
 
 # likely there are more exceptions, take a look at yarl example
 try:
     setup(**kwargs)
 except CalledProcessError:
-    print('Failed to build extension!')
-    del kwargs['ext_modules']
+    print("Failed to build extension!")
+    del kwargs["ext_modules"]
     setup(**kwargs)

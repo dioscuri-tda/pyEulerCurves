@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 This is a module to be used as a reference for building other modules
 """
@@ -14,7 +15,7 @@ from .ecc_utils import euler_characteristic_list_from_all
 
 
 class ECC_from_pointcloud(TransformerMixin, BaseEstimator):
-    """ An example transformer that returns the element-wise square root.
+    """An example transformer that returns the element-wise square root.
 
     For more information regarding how to build your own transformer, read more
     in the :ref:`User Guide <user_guide>`.
@@ -57,7 +58,7 @@ class ECC_from_pointcloud(TransformerMixin, BaseEstimator):
         return self
 
     def transform(self, X):
-        """ A reference implementation of a transform function.
+        """A reference implementation of a transform function.
 
         Parameters
         ----------
@@ -71,7 +72,7 @@ class ECC_from_pointcloud(TransformerMixin, BaseEstimator):
             in ``X``.
         """
         # Check is fit had been called
-        check_is_fitted(self, 'n_features_')
+        check_is_fitted(self, "n_features_")
 
         # Input validation
         X = check_array(X, accept_sparse=True)
@@ -79,30 +80,33 @@ class ECC_from_pointcloud(TransformerMixin, BaseEstimator):
         # Check that the input is of the same shape as the one passed
         # during fit.
         if X.shape[1] != self.n_features_:
-            raise ValueError('Shape of input is different from what was seen'
-                             'in `fit`')
+            raise ValueError(
+                "Shape of input is different from what was seen" "in `fit`"
+            )
 
         # compute the list of local contributions to the ECC
-        contributions_list, self.number_of_simplices = compute_local_contributions(X, self.epsilon,
-                                                         self.workers)
+        contributions_list, self.number_of_simplices = compute_local_contributions(
+            X, self.epsilon, self.workers
+        )
 
         # returns the ECC
         return euler_characteristic_list_from_all(contributions_list)
 
 
-def plot_euler_curve(e_list, with_lines=False, title = None):
+def plot_euler_curve(e_list, with_lines=False, title=None):
     plt.figure()
     plt.scatter([f[0] for f in e_list], [f[1] for f in e_list])
 
     # draw horizontal and vertical lines b/w points
 
     if with_lines:
-        #plt.hlines(y = e_list[0][1], xmin=0, xmax=e_list[1][0])
-
         for i in range(1, len(e_list)):
-            plt.vlines(x=e_list[i][0], ymin=min(e_list[i-1][1], e_list[i][1]),ymax=max(e_list[i-1][1], e_list[i][1]))
-
-            plt.hlines(y=e_list[i-1][1], xmin=e_list[i-1][0], xmax=e_list[i][0])
+            plt.vlines(
+                x=e_list[i][0],
+                ymin=min(e_list[i - 1][1], e_list[i][1]),
+                ymax=max(e_list[i - 1][1], e_list[i][1]),
+            )
+            plt.hlines(y=e_list[i - 1][1], xmin=e_list[i - 1][0], xmax=e_list[i][0])
 
     plt.xlabel("filtration")
     plt.ylabel("euler characteristic")
