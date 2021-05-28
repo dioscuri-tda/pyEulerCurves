@@ -103,7 +103,7 @@ from subprocess import CalledProcessError
 
 kwargs = dict(
     name='pyEulerCurves',
-    version='0.0.1',
+    version='0.1',
     author='Davide Gurnari',
     author_email='davide.gurnari@gmail.com',
     description='A test project using pybind11 and CMake',
