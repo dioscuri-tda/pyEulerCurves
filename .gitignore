@@ -7,3 +7,5 @@ _generate/
 *.egg-info
 *env*
 examples/.DS_Store
+tests/.DS_Store
+tests/.DS_Store
