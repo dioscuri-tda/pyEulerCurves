@@ -111,7 +111,11 @@ kwargs = dict(
     ext_modules=[CMakeExtension('pyEulerCurves._compute_local_EC_VR')],
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
-    packages=['pyEulerCurves']
+    packages=['pyEulerCurves'],
+    install_requires=[
+    "numpy >= 1.19.2",
+    "matplotlib >= 3.3"
+    ]
 )
 
 # likely there are more exceptions, take a look at yarl example
