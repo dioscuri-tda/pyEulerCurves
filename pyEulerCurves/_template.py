@@ -165,12 +165,25 @@ class ECC_from_bitmap(TransformerMixin, BaseEstimator):
             )
 
         # compute the list of local contributions to the ECC
+        # numpy array have the following dimension convention
+        # [z,y,x] but we want it to be [x,y,z]
         bitmap_dim = list(X.shape)
         bitmap_dim.reverse()
 
+        if type(self.periodic_boundary) is list:
+            if len(self.periodic_boundary) != len(bitmap_dim):
+                raise ValueError(
+                    "Dimension of input is different from the number of boundary conditions"
+                )
+            bitmap_boundary = self.periodic_boundary.copy()
+            bitmap_boundary.reverse()
+        else:
+            bitmap_boundary = False
+
         self.contributions_list = compute_cubical_contributions(top_dimensional_cells=X.flatten(order='C'),
-                                                           dimensions=bitmap_dim,
-                                                           workers=2)
+                                                                dimensions=bitmap_dim,
+                                                                periodic_boundary=bitmap_boundary,
+                                                                workers=2)
 
         self.number_of_simplices = sum([2*n+1 for n in X.shape])
 

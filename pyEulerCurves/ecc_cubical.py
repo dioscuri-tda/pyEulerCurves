@@ -1,15 +1,23 @@
 import numpy as np
 import itertools
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
-from ._compute_local_EC_cubical import compute_contributions_two_slices
+from ._compute_local_EC_cubical import compute_contributions_two_slices, compute_contributions_two_slices_PERIODIC
 
 
 
-def compute_contributions_single_slice(slices, dim):
-    return dict(compute_contributions_two_slices(slices,dim))
+def compute_contributions_single_slice(slices, dim, periodic_boundary):
+    if type(periodic_boundary) is list:
+        if len(periodic_boundary) != len(dim):
+            raise ValueError(
+                "Dimension of input is different from the number of boundary conditions"
+            )
+        return dict(compute_contributions_two_slices_PERIODIC(slices, dim, periodic_boundary))
+    else:
+        return dict(compute_contributions_two_slices(slices,dim))
 
 
-def compute_cubical_contributions(top_dimensional_cells, dimensions, workers=1):
+def compute_cubical_contributions(top_dimensional_cells, dimensions,
+                                  periodic_boundary=False, workers=1):
 
     slice_len = 1
     for d in dimensions[:-1]:
@@ -26,7 +34,9 @@ def compute_cubical_contributions(top_dimensional_cells, dimensions, workers=1):
                                          for i in range(0,
                                                         len(top_dimensional_cells)-slice_len,
                                                         slice_len)],
-                                 itertools.repeat(dimensions[:-1]+[2]))
+                                 itertools.repeat(dimensions[:-1]+[2]),
+                                 itertools.repeat(periodic_boundary)
+                                 )
 
     ECC_dict = dict()
     for single_ECC in ECC_list:
