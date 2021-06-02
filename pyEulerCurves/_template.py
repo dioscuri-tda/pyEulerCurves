@@ -51,7 +51,7 @@ class ECC_from_pointcloud(TransformerMixin, BaseEstimator):
         self : object
             Returns self.
         """
-        X = check_array(X, accept_sparse=True)
+        X = check_array(X, accept_sparse=True, allow_nd=True)
 
         self.n_features_ = X.shape[1]
 
@@ -76,7 +76,7 @@ class ECC_from_pointcloud(TransformerMixin, BaseEstimator):
         check_is_fitted(self, "n_features_")
 
         # Input validation
-        X = check_array(X, accept_sparse=True)
+        X = check_array(X, accept_sparse=True, allow_nd=True)
 
         # Check that the input is of the same shape as the one passed
         # during fit.
@@ -130,7 +130,7 @@ class ECC_from_bitmap(TransformerMixin, BaseEstimator):
         self : object
             Returns self.
         """
-        X = check_array(X, accept_sparse=True)
+        X = check_array(X, accept_sparse=True, allow_nd=True)
 
         self.n_features_ = X.shape[1]
 
@@ -155,7 +155,7 @@ class ECC_from_bitmap(TransformerMixin, BaseEstimator):
         check_is_fitted(self, "n_features_")
 
         # Input validation
-        X = check_array(X, accept_sparse=True)
+        X = check_array(X, accept_sparse=True, allow_nd=True)
 
         # Check that the input is of the same shape as the one passed
         # during fit.
@@ -165,49 +165,14 @@ class ECC_from_bitmap(TransformerMixin, BaseEstimator):
             )
 
         # compute the list of local contributions to the ECC
-        contributions_list, self.number_of_simplices = compute_local_contributions(
-            X, self.epsilon, self.workers
-        )
+        bitmap_dim = list(X.shape)
+        bitmap_dim.reverse()
 
-        contributions_list = compute_cubical_contributions(top_dimensional_cells=X.flatten(order='F'),
-                                                           dimensions=list(X.shape),
+        self.contributions_list = compute_cubical_contributions(top_dimensional_cells=X.flatten(order='C'),
+                                                           dimensions=bitmap_dim,
                                                            workers=2)
 
         self.number_of_simplices = sum([2*n+1 for n in X.shape])
 
         # returns the ECC
-        return euler_characteristic_list_from_all(contributions_list)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-def plot_euler_curve(e_list, with_lines=False, title=None):
-    plt.figure()
-    plt.scatter([f[0] for f in e_list], [f[1] for f in e_list])
-
-    # draw horizontal and vertical lines b/w points
-
-    if with_lines:
-        for i in range(1, len(e_list)):
-            plt.vlines(
-                x=e_list[i][0],
-                ymin=min(e_list[i - 1][1], e_list[i][1]),
-                ymax=max(e_list[i - 1][1], e_list[i][1]),
-            )
-            plt.hlines(y=e_list[i - 1][1], xmin=e_list[i - 1][0], xmax=e_list[i][0])
-
-    plt.xlabel("filtration")
-    plt.ylabel("euler characteristic")
-    plt.title(title)
+        return euler_characteristic_list_from_all(self.contributions_list)

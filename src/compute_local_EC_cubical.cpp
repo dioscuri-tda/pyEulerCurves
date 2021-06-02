@@ -244,7 +244,7 @@ specialization_double_compute_local_euler_from_two_constitutive_slices_no_period
 }
 
 
-PYBIND11_MODULE(compute_local_EC_cubical, m) {
+PYBIND11_MODULE(_compute_local_EC_cubical, m) {
     m.doc() = "test plugin"; // optional module docstring
 
     m.def("compute_contributions_two_slices",
