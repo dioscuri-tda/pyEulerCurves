@@ -7,11 +7,14 @@ def create_local_graph(points, i, threshold, dbg=False):
     center_vertex = points[i]
 
     # enumeration needs to start from i+1 because the center is at position i
-    id_neigs_of_center_vectex = [j for j,point in enumerate(points[i+1:], i+1)
-                                 if np.linalg.norm(center_vertex - point) <= threshold]
+    id_neigs_of_center_vectex = [
+        j
+        for j, point in enumerate(points[i + 1 :], i + 1)
+        if np.linalg.norm(center_vertex - point) <= threshold
+    ]
 
-    if dbg: print(id_neigs_of_center_vectex)
-
+    if dbg:
+        print(id_neigs_of_center_vectex)
     # create the center graph as a list of lists
     # each list corespond to a node and contains its neighbours with distance
     # note, edges are always of the type
@@ -26,24 +29,26 @@ def create_local_graph(points, i, threshold, dbg=False):
     mapped_center_vertex = []
     # enumeration needs to start from 1 because 0 is the center
     for j, neigh in enumerate(id_neigs_of_center_vectex, 1):
-        mapped_center_vertex.append( (j, np.linalg.norm(center_vertex - points[neigh])) )
+        mapped_center_vertex.append((j, np.linalg.norm(center_vertex - points[neigh]))
 
     considered_graph.append(mapped_center_vertex)
 
     # add the rest
     for j, neigh in enumerate(id_neigs_of_center_vectex, 1):
 
-        if dbg: print(j, neigh)
+        if dbg:
+            print(j, neigh)
 
         neighbours_of_j = []
 
         # add the others
         # note that the index k starts from 1, be careful with the indexing
-        for z, other_neigh in enumerate(id_neigs_of_center_vectex[j:], j+1):
-            if dbg: print('    ', z, other_neigh)
+        for z, other_neigh in enumerate(id_neigs_of_center_vectex[j:], j + 1):
+            if dbg:
+                print("    ", z, other_neigh)
             dist = np.linalg.norm(points[neigh] - points[other_neigh])
-            if (dist <= threshold):
-                neighbours_of_j.append( (z, dist) )
+            if dist <= threshold:
+                neighbours_of_j.append((z, dist))
 
         considered_graph.append(neighbours_of_j)
 
@@ -61,10 +66,14 @@ def compute_local_contributions(point_cloud, epsilon, workers=1):
     # simplices in its star
 
     with ProcessPoolExecutor(max_workers=workers) as executor:
-        ECC_list, num_simplices_list = zip(*executor.map(compute_contributions_single_vertex,
-                                                         itertools.repeat(point_cloud),
-                                                         [i for i in range(len(point_cloud))],
-                                                         itertools.repeat(epsilon)))
+        ECC_list, num_simplices_list = zip(
+            *executor.map(
+                compute_contributions_single_vertex,
+                itertools.repeat(point_cloud),
+                [i for i in range(len(point_cloud))],
+                itertools.repeat(epsilon),
+            )
+        )
 
     total_ECC = dict()
 
@@ -80,4 +89,4 @@ def compute_local_contributions(point_cloud, epsilon, workers=1):
     for key in to_del:
         del total_ECC[key]
 
-    return sorted(list(total_ECC.items()), key = lambda x: x[0]), sum(num_simplices_list)
+    return sorted(list(total_ECC.items()), key=lambda x: x[0]), sum(num_simplices_list)
