@@ -21,9 +21,9 @@ requirements:
 
   run:
     - python
-    - numpy >= 1.19
-    - matplotlib >= 3.3
-    - scikit-learn >= 0.23
+    - numpy >=1.19
+    - matplotlib >=3.3
+    - scikit-learn >=0.23
 
 
 test:
