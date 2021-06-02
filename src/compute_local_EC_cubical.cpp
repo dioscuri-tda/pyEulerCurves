@@ -238,9 +238,18 @@ void store_output( const std::vector< std::pair<T,int> >& ecc , const char* file
 
 std::vector< std::pair<double,int> >
 specialization_double_compute_local_euler_from_two_constitutive_slices_no_periodic_b_cond( const std::vector< double >& data ,
-	                                                                                      const std::vector< unsigned >& sizes)
+	                                                                                         const std::vector< unsigned >& sizes)
 {
 	return compute_local_euler_from_two_constitutive_slices_no_periodic_b_cond( data , sizes);
+}
+
+
+std::vector< std::pair<double,int> >
+specialization_double_compute_local_euler_from_two_constitutive_slices_periodic_b_cond( const std::vector< double >& data ,
+	                                                                                      const std::vector< unsigned >& sizes,
+																																											  const std::vector< bool >& dimensions_of_periodicity )
+{
+	return compute_local_euler_from_two_constitutive_slices_periodic_b_cond( data , sizes, dimensions_of_periodicity);
 }
 
 
@@ -250,4 +259,8 @@ PYBIND11_MODULE(_compute_local_EC_cubical, m) {
     m.def("compute_contributions_two_slices",
 		      &specialization_double_compute_local_euler_from_two_constitutive_slices_no_periodic_b_cond,
 					"specialization_double_compute_local_euler_from_two_constitutive_slices_no_periodic_b_cond");
+
+		m.def("compute_contributions_two_slices_PERIODIC",
+					&specialization_double_compute_local_euler_from_two_constitutive_slices_periodic_b_cond,
+					"specialization_double_compute_local_euler_from_two_constitutive_slices_periodic_b_cond");
 }
