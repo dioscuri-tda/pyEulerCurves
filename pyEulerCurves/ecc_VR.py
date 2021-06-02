@@ -29,7 +29,7 @@ def create_local_graph(points, i, threshold, dbg=False):
     mapped_center_vertex = []
     # enumeration needs to start from 1 because 0 is the center
     for j, neigh in enumerate(id_neigs_of_center_vectex, 1):
-        mapped_center_vertex.append((j, np.linalg.norm(center_vertex - points[neigh]))
+        mapped_center_vertex.append((j, np.linalg.norm(center_vertex - points[neigh])))
 
     considered_graph.append(mapped_center_vertex)
 

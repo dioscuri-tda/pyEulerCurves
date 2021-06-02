@@ -9,3 +9,4 @@ _generate/
 examples/.DS_Store
 tests/.DS_Store
 tests/.DS_Store
+examples/.ipynb_checkpoints/example_Vietoris-Rips-checkpoint.ipynb
