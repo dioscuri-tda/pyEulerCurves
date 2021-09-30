@@ -20,7 +20,8 @@ def euler_characteristic_list_from_all(local_contributions):
         current_characteristic += contribution
 
     # add last contribution
-    euler_characteristic.append([filtration, current_characteristic])
+    if len(local_contributions) > 1:
+        euler_characteristic.append([filtration, current_characteristic])
 
     return euler_characteristic
 
