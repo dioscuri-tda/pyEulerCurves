@@ -98,7 +98,7 @@ class ECC_from_pointcloud(TransformerMixin, BaseEstimator):
         self.num_simplices = sum(self.num_simplices_list)
 
         # returns the ECC
-        return euler_characteristic_list_from_all(contributions_list)
+        return euler_characteristic_list_from_all(self.contributions_list)
 
 
 class ECC_from_bitmap(TransformerMixin, BaseEstimator):
