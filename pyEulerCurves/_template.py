@@ -88,7 +88,7 @@ class ECC_from_pointcloud(TransformerMixin, BaseEstimator):
             )
 
         # compute the list of local contributions to the ECC
-        (contributions_list, self.num_simplices_list,
+        (self.contributions_list, self.num_simplices_list,
         self.max_dimension_list,
         self.times) = compute_local_contributions(
             X, self.epsilon, self.workers,
