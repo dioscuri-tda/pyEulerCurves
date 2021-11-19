@@ -31,24 +31,26 @@ def euler_characteristic_list_from_all(local_contributions):
 
 # WARNING
 # when plotting a lot of points, drawing the lines can take some time
-def plot_euler_curve(e_list, with_lines=False, title=None):
-    plt.figure()
-    plt.scatter([f[0] for f in e_list], [f[1] for f in e_list])
+def plot_euler_curve(e_list, this_ax=None, with_lines=False, **kwargs):
 
+    if this_ax == None:
+        this_ax = plt.gca()
+
+    # Plotting
+    this_ax.scatter([f[0] for f in e_list], [f[1] for f in e_list])
     # draw horizontal and vertical lines b/w points
-
     if with_lines:
         for i in range(1, len(e_list)):
-            plt.vlines(
+            this_ax.vlines(
                 x=e_list[i][0],
                 ymin=min(e_list[i - 1][1], e_list[i][1]),
                 ymax=max(e_list[i - 1][1], e_list[i][1]),
             )
-            plt.hlines(y=e_list[i - 1][1], xmin=e_list[i - 1][0], xmax=e_list[i][0])
+            this_ax.hlines(y=e_list[i - 1][1], xmin=e_list[i - 1][0], xmax=e_list[i][0])
 
-    plt.xlabel("Filtration")
-    plt.ylabel("Euler Characteristic")
-    plt.title(title)
+    this_ax.set_xlabel("Filtration")
+    this_ax.set_ylabel("Euler Characteristic")
+    return this_ax
 
 
 
