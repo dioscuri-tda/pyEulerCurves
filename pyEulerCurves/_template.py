@@ -31,9 +31,11 @@ class ECC_from_pointcloud(TransformerMixin, BaseEstimator):
     n_features_ : int
         The number of features of the data passed to :meth:`fit`.
     """
-    def __init__(self, epsilon=0, workers=1):
+    def __init__(self, epsilon=0, workers=1, dbg=False, measure_times=False):
         self.epsilon = epsilon
         self.workers = workers
+        self.dbg = dbg
+        self.measure_times = measure_times
 
     def fit(self, X, y=None):
         """A reference implementation of a fitting function for a transformer.
@@ -86,12 +88,17 @@ class ECC_from_pointcloud(TransformerMixin, BaseEstimator):
             )
 
         # compute the list of local contributions to the ECC
-        contributions_list, self.number_of_simplices = compute_local_contributions(
-            X, self.epsilon, self.workers
+        (self.contributions_list, self.num_simplices_list,
+        self.max_dimension_list,
+        self.times) = compute_local_contributions(
+            X, self.epsilon, self.workers,
+            self.dbg, self.measure_times
         )
 
+        self.num_simplices = sum(self.num_simplices_list)
+
         # returns the ECC
-        return euler_characteristic_list_from_all(contributions_list)
+        return euler_characteristic_list_from_all(self.contributions_list)
 
 
 class ECC_from_bitmap(TransformerMixin, BaseEstimator):

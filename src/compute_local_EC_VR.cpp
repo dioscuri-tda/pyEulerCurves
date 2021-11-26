@@ -15,7 +15,7 @@ using namespace std;
 
 //this is an Euler characteristic curve, as a real valued function with values in integers. This is what we compute locally
 // inline std::vector< std::pair< double , int > >
-inline std::pair< std::map< double , int > , int>
+inline std::tuple< std::map< double , int > , int, int>
 compute_local_EC(
 const std::vector< std::vector< std::pair< unsigned , double > > >& considered_graph,
 const bool & dbg = false
@@ -225,6 +225,7 @@ const bool & dbg = false
                 if ( dbg )cerr << "The filtration of this simplex is : " << filtration_of_this_simplex << endl;
 
                 //now we still need to deal with the common neighbors.
+                // complexity O(common_neighs[i].size() * log(neighs_of_vertices[new_vertex].size()))
                 std::vector<unsigned> neighs_of_new_simplex;
                 neighs_of_new_simplex.reserve( common_neighs[i].size() );
                 unsigned new_vertex = common_neighs[i][j];
@@ -232,6 +233,8 @@ const bool & dbg = false
                 {
                     // there seems to be a mistake, there was no k in this loop
                     // I substituted j --> k
+                    // if find() is not successful returns an iterator to set::end
+                    // complexity of find() is log in size
                     if ( neighs_of_vertices[new_vertex].find( common_neighs[i][k] ) != neighs_of_vertices[new_vertex].end() )
                     {
                         neighs_of_new_simplex.push_back( common_neighs[i][k] );
@@ -266,7 +269,8 @@ const bool & dbg = false
     //     result.push_back( std::make_pair( it->first , it->second ) );
     // }
 
-    return std::make_pair(ECC, number_of_simplices);
+    // return std::make_pair(ECC, number_of_simplices);
+    return std::make_tuple(ECC, number_of_simplices, dimension-1);
 }//compute_local_EC
 
 

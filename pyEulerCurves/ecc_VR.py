@@ -1,6 +1,7 @@
 import numpy as np
 import itertools
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
+from timeit import default_timer
 from ._compute_local_EC_VR import compute_contributions_vertex
 
 def create_local_graph(points, i, threshold, dbg=False):
@@ -14,7 +15,7 @@ def create_local_graph(points, i, threshold, dbg=False):
     ]
 
     if dbg:
-        print(id_neigs_of_center_vectex)
+        print("\t {} neigbours".format(len(id_neigs_of_center_vectex)))
     # create the center graph as a list of lists
     # each list corespond to a node and contains its neighbours with distance
     # note, edges are always of the type
@@ -36,16 +37,11 @@ def create_local_graph(points, i, threshold, dbg=False):
     # add the rest
     for j, neigh in enumerate(id_neigs_of_center_vectex, 1):
 
-        if dbg:
-            print(j, neigh)
-
         neighbours_of_j = []
 
         # add the others
         # note that the index k starts from 1, be careful with the indexing
         for z, other_neigh in enumerate(id_neigs_of_center_vectex[j:], j + 1):
-            if dbg:
-                print("    ", z, other_neigh)
             dist = np.linalg.norm(points[neigh] - points[other_neigh])
             if dist <= threshold:
                 neighbours_of_j.append((z, dist))
@@ -55,23 +51,37 @@ def create_local_graph(points, i, threshold, dbg=False):
     return considered_graph
 
 
-def compute_contributions_single_vertex(point_cloud, i, epsilon):
-    graph_i = create_local_graph(point_cloud, i, epsilon)
-    local_ECC, number_of_simplices = compute_contributions_vertex(graph_i, False)
-    return local_ECC, number_of_simplices
+def compute_contributions_single_vertex(point_cloud, i, epsilon, dbg=False, measure_times=False):
+    if dbg:
+        print("point {}".format(i), end="")
+    graph_i = create_local_graph(point_cloud, i, epsilon, dbg)
+    if measure_times:
+        start = default_timer()
+        local_ECC, number_of_simplices, max_dimension = compute_contributions_vertex(graph_i, False)
+        my_time = default_timer() - start
+    else:
+        local_ECC, number_of_simplices, max_dimension = compute_contributions_vertex(graph_i, False)
+        my_time = 0
+
+    return local_ECC, number_of_simplices, max_dimension, my_time
 
 
-def compute_local_contributions(point_cloud, epsilon, workers=1):
+def compute_local_contributions(point_cloud, epsilon, workers=1, dbg=False, measure_times=False):
     # for each point, create its local graph and find all the
     # simplices in its star
+    if dbg:
+        print("compute local contributions")
+        print("point cloud size {}".format(point_cloud.shape))
 
     with ProcessPoolExecutor(max_workers=workers) as executor:
-        ECC_list, num_simplices_list = zip(
+        ECC_list, num_simplices_list, max_dimension_list, times_list = zip(
             *executor.map(
                 compute_contributions_single_vertex,
                 itertools.repeat(point_cloud),
                 [i for i in range(len(point_cloud))],
                 itertools.repeat(epsilon),
+                itertools.repeat(dbg),
+                itertools.repeat(measure_times)
             )
         )
 
@@ -89,4 +99,6 @@ def compute_local_contributions(point_cloud, epsilon, workers=1):
     for key in to_del:
         del total_ECC[key]
 
-    return sorted(list(total_ECC.items()), key=lambda x: x[0]), sum(num_simplices_list)
+    return (sorted(list(total_ECC.items()), key=lambda x: x[0]),
+            num_simplices_list, max_dimension_list,
+            times_list)
