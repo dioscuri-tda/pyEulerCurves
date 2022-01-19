@@ -33,7 +33,7 @@ class ECC_from_pointcloud(TransformerMixin, BaseEstimator):
     """
     def __init__(self, epsilon=0, max_dimension=-1, workers=1, dbg=False, measure_times=False):
         self.epsilon = epsilon
-        self.max_dimension = -1
+        self.max_dimension = max_dimension
         self.workers = workers
         self.dbg = dbg
         self.measure_times = measure_times
