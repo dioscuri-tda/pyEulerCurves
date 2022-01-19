@@ -154,7 +154,7 @@ const bool & dbg = false
     while ( !simplices_in_current_dimension.empty() )
     {
 
-        if (dimension == max_dimension) {
+        if ((dimension-1) == max_dimension) {
           break;
         }
 
