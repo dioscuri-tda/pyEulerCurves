@@ -51,22 +51,28 @@ def create_local_graph(points, i, threshold, dbg=False):
     return considered_graph
 
 
-def compute_contributions_single_vertex(point_cloud, i, epsilon, dbg=False, measure_times=False):
+def compute_contributions_single_vertex(point_cloud, i, epsilon,
+                                        max_dimension = -1,
+                                        dbg=False, measure_times=False):
     if dbg:
         print("point {}".format(i), end="")
     graph_i = create_local_graph(point_cloud, i, epsilon, dbg)
     if measure_times:
         start = default_timer()
-        local_ECC, number_of_simplices, max_dimension = compute_contributions_vertex(graph_i, False)
+        local_ECC, number_of_simplices, largest_dimension = compute_contributions_vertex(graph_i,
+                                                                                         max_dimension,
+                                                                                         False)
         my_time = default_timer() - start
     else:
-        local_ECC, number_of_simplices, max_dimension = compute_contributions_vertex(graph_i, False)
+        local_ECC, number_of_simplices, largest_dimension = compute_contributions_vertex(graph_i,
+                                                                                         max_dimension,
+                                                                                         False)
         my_time = 0
 
-    return local_ECC, number_of_simplices, max_dimension, my_time
+    return local_ECC, number_of_simplices, largest_dimension, my_time
 
 
-def compute_local_contributions(point_cloud, epsilon, workers=1, dbg=False, measure_times=False):
+def compute_local_contributions(point_cloud, epsilon, max_dimension = -1, workers=1, dbg=False, measure_times=False):
     # for each point, create its local graph and find all the
     # simplices in its star
     if dbg:
@@ -74,12 +80,13 @@ def compute_local_contributions(point_cloud, epsilon, workers=1, dbg=False, meas
         print("point cloud size {}".format(point_cloud.shape))
 
     with ProcessPoolExecutor(max_workers=workers) as executor:
-        ECC_list, num_simplices_list, max_dimension_list, times_list = zip(
+        ECC_list, num_simplices_list, largest_dimension_list, times_list = zip(
             *executor.map(
                 compute_contributions_single_vertex,
                 itertools.repeat(point_cloud),
                 [i for i in range(len(point_cloud))],
                 itertools.repeat(epsilon),
+                itertools.repeat(max_dimension),
                 itertools.repeat(dbg),
                 itertools.repeat(measure_times)
             )
@@ -100,5 +107,5 @@ def compute_local_contributions(point_cloud, epsilon, workers=1, dbg=False, meas
         del total_ECC[key]
 
     return (sorted(list(total_ECC.items()), key=lambda x: x[0]),
-            num_simplices_list, max_dimension_list,
+            num_simplices_list, largest_dimension_list,
             times_list)

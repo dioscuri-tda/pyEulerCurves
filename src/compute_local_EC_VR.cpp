@@ -18,6 +18,7 @@ using namespace std;
 inline std::tuple< std::map< double , int > , int, int>
 compute_local_EC(
 const std::vector< std::vector< std::pair< unsigned , double > > >& considered_graph,
+const int & max_dimension = -1,
 const bool & dbg = false
 )
 
@@ -152,6 +153,11 @@ const bool & dbg = false
     int dimm = 1;
     while ( !simplices_in_current_dimension.empty() )
     {
+
+        if (dimension = max_dimension) {
+          break;
+        }
+
         //first we declare all cointainters that we need.
         std::vector< std::vector< unsigned > > new_simplices_in_current_dimension;
         new_simplices_in_current_dimension.reserve( simplices_in_current_dimension.size() );

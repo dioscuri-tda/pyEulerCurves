@@ -31,8 +31,9 @@ class ECC_from_pointcloud(TransformerMixin, BaseEstimator):
     n_features_ : int
         The number of features of the data passed to :meth:`fit`.
     """
-    def __init__(self, epsilon=0, workers=1, dbg=False, measure_times=False):
+    def __init__(self, epsilon=0, max_dimension=-1, workers=1, dbg=False, measure_times=False):
         self.epsilon = epsilon
+        self.max_dimension = -1
         self.workers = workers
         self.dbg = dbg
         self.measure_times = measure_times
@@ -89,9 +90,9 @@ class ECC_from_pointcloud(TransformerMixin, BaseEstimator):
 
         # compute the list of local contributions to the ECC
         (self.contributions_list, self.num_simplices_list,
-        self.max_dimension_list,
+        self.largest_dimension_list,
         self.times) = compute_local_contributions(
-            X, self.epsilon, self.workers,
+            X, self.epsilon, self.max_dimension, self.workers,
             self.dbg, self.measure_times
         )
 

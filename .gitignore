@@ -12,3 +12,4 @@ tests/.DS_Store
 examples/.ipynb_checkpoints/example_Vietoris-Rips-checkpoint.ipynb
 examples/.ipynb_checkpoints/example_cubical-checkpoint.ipynb
 examples/data/.DS_Store
+*.ipynb
