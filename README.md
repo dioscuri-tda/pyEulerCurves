@@ -4,21 +4,18 @@ A python package to compute Euler Characteristic Curves of point-cloud or image 
 ## Prerequisites
 
 * A compiler with C++11 support
-* CMake >= 3.4 or Pip 10+
-* Ninja or Pip 10+
+* pybind11
+* numpy
+* scikit-learn
 
 ## Installation
 
-Just clone this repository and pip install. Note the `--recursive` option which is
-needed for the pybind11 submodule:
+Just clone this repository and pip install it.
 
 ```bash
-git clone --recursive https://github.com/dgurnari/pyEulerCurves.git
+git clone https://github.com/dgurnari/pyEulerCurves.git
 pip install ./pyEulerCurves
 ```
-
-With the `setup.py` file included in this example, the `pip install` command will
-invoke CMake and build the pybind11 module as specified in `CMakeLists.txt`.
 
 
 ## Examples
