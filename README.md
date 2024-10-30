@@ -10,7 +10,13 @@ A python package to compute Euler Characteristic Curves of point-cloud or image 
 
 ## Installation
 
-Just clone this repository and pip install it.
+Install it from PyPI
+
+```bash
+pip install pyeulercurves
+```
+
+Or clone this repository and pip install.
 
 ```bash
 git clone https://github.com/dgurnari/pyEulerCurves.git

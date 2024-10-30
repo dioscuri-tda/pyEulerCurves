@@ -282,6 +282,5 @@ const bool & dbg = false
 
 PYBIND11_MODULE(_compute_local_EC_VR, m) {
     m.doc() = "compute_contributions_vertex test plugin"; // optional module docstring
-
     m.def("compute_contributions_vertex", &compute_local_EC, "compute contributions single vertex");
 }
