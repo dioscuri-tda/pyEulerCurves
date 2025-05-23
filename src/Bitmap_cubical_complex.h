@@ -13,6 +13,35 @@
 #include <stdexcept>
 #include <cstddef>
 
+
+// Overload operator<< to print vectors nicely
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec) {
+    os << "[";
+    for (size_t i = 0; i < vec.size(); ++i) {
+        os << vec[i];
+        if (i + 1 != vec.size()) os << ", ";
+    }
+    os << "]";
+    return os;
+}
+
+
+
+template<typename T>
+T get_default_cell_value(unsigned /*unused*/ = 1);
+
+template<>
+inline double get_default_cell_value<double>(unsigned) {
+    return std::numeric_limits<double>::infinity();
+}
+
+template<>
+inline std::vector<double> get_default_cell_value<std::vector<double>>(unsigned vec_size) {
+    return std::vector<double>(vec_size, std::numeric_limits<double>::infinity());
+}
+
+
 /**
  * @brief Cubical complex represented as a bitmap, class with basic implementation.
  * @ingroup cubical_complex
@@ -238,15 +267,18 @@ class Bitmap_cubical_complex_base {
   std::vector<unsigned> multipliers;
   std::vector<T> data;
   std::size_t total_number_of_cells;
+  unsigned filtration_vector_size = 1; // default is scalar filtration
 
-  void set_up_containers(const std::vector<unsigned>& sizes) {
+
+  void set_up_containers(const std::vector<unsigned>& sizes, const unsigned & filtration_vector_size) {
+
     unsigned multiplier = 1;
     for (std::size_t i = 0; i != sizes.size(); ++i) {
       this->sizes.push_back(sizes[i]);
       this->multipliers.push_back(multiplier);
       multiplier *= 2 * sizes[i] + 1;
     }
-    this->data = std::vector<T>(multiplier, std::numeric_limits<T>::infinity());
+    this->data = std::vector<T>(multiplier, get_default_cell_value<T>(filtration_vector_size));
     this->total_number_of_cells = multiplier;
   }
 
@@ -290,7 +322,7 @@ std::ostream& operator<<(std::ostream& out, const Bitmap_cubical_complex_base<K>
 template <typename T>
 void Bitmap_cubical_complex_base<T>::setup_bitmap_based_on_top_dimensional_cells_list(
     const std::vector<unsigned>& sizes_in_following_directions, const std::vector<T>& top_dimensional_cells) {
-  this->set_up_containers(sizes_in_following_directions);
+  this->set_up_containers(sizes_in_following_directions, top_dimensional_cells[0].size());
 
   std::size_t number_of_top_dimensional_elements = 1;
   for (std::size_t i = 0; i != sizes_in_following_directions.size(); ++i) {
@@ -451,20 +483,27 @@ void Bitmap_cubical_complex_base<T>::impose_lower_star_filtration() {
       }
     }
     std::vector<std::size_t> new_indices_to_consider;
-    for (std::size_t i = 0; i != indices_to_consider.size(); ++i) {
+
+    for (std::size_t i = 0; i != indices_to_consider.size(); ++i)
+    {
       std::vector<std::size_t> bd = this->get_boundary_of_a_cell(indices_to_consider[i]);
-      for (std::size_t boundaryIt = 0; boundaryIt != bd.size(); ++boundaryIt) {
+      for (std::size_t boundaryIt = 0; boundaryIt != bd.size(); ++boundaryIt)
+      {
         if (dbg) {
           std::clog << "filtration of a cell : " << bd[boundaryIt] << " is : " << this->data[bd[boundaryIt]]
                     << " while of a cell: " << indices_to_consider[i] << " is: " << this->data[indices_to_consider[i]]
                     << std::endl;
         }
-        if (this->data[bd[boundaryIt]] > this->data[indices_to_consider[i]]) {
-          this->data[bd[boundaryIt]] = this->data[indices_to_consider[i]];
-          if (dbg) {
-            std::clog << "Setting the value of a cell : " << bd[boundaryIt]
+        for ( size_t v = 0 ; v != this->data[bd[boundaryIt]].size() ; ++v )
+        {
+          if (this->data[bd[boundaryIt]][v] > this->data[indices_to_consider[i]][v])
+            {
+              this->data[bd[boundaryIt]][v] = this->data[indices_to_consider[i]][v];
+              if (dbg) {
+                std::clog << "Setting the value of a cell : " << bd[boundaryIt]
                       << " to : " << this->data[indices_to_consider[i]] << std::endl;
-          }
+              }
+            }
         }
         if (is_this_cell_considered[bd[boundaryIt]] == false) {
           new_indices_to_consider.push_back(bd[boundaryIt]);
@@ -475,6 +514,11 @@ void Bitmap_cubical_complex_base<T>::impose_lower_star_filtration() {
     indices_to_consider.swap(new_indices_to_consider);
   }
 }
+
+
+
+
+
 
 template <typename T>
 bool compareFirstElementsOfTuples(const std::pair<std::pair<T, std::size_t>, char>& first,

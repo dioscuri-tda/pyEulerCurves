@@ -30,39 +30,41 @@ std::vector< std::pair<T,int> > compute_local_ECC( cub_cmplx& b , double fractio
 		std::cerr << "b.size() : " << b.size() << std::endl;
 		std::cerr << "lower_bound : " << lower_bound << std::endl;
 		std::cerr << "upper_bound : " << upper_bound << std::endl;
-		getchar();
+		// getchar();
 	}
 
-
-    std::vector< std::pair<double,int> > result;
+	// for multiparameter filtrations
+	// result is a pair (vector, int)
+    std::vector< std::pair<T,int> > result;
     result.reserve( upper_bound -lower_bound  );
     for ( size_t i = lower_bound ; i != upper_bound ; ++i )
     {
 		 int expp = 1;
-         if ( b.get_dimension_of_a_cell(i)%2 == 1 )expp = -1;
+         if ( b.get_dimension_of_a_cell(i)%2 == 1 ) expp = -1;
 
 		 if ( dbg )
 		 {
 			std::cerr << "Adding contribution : " << b.get_cell_data(i) << " with the coef : " << expp << " and dimension : " << b.get_dimension_of_a_cell(i) << std::endl;
-			getchar();
+			// getchar();
 		}
 
-         std::pair< double, int > p = std::make_pair( b.get_cell_data(i) , expp );
+         std::pair< T, int > p = std::make_pair( b.get_cell_data(i) , expp );
          result.push_back( p );
     }
 
+	// WE CANNOT SORT MULTIFILTRATIONS
     //now sort result according to the first coordinate:
-    std::sort( result.begin() , result.end() );
+    // std::sort( result.begin() , result.end() );
 
-    if ( dbg )
-    {
-		std::cerr << "Here is the result: \n";
-		for ( size_t i = 0 ; i != result.size() ; ++i )
-		{
-			std::cerr << result[i].first << " , " << result[i].second << std::endl;
-		}
-		std::cerr << "End.\n";
-	}
+    // if ( dbg )
+    // {
+	// 	std::cerr << "Here is the result: \n";
+	// 	for ( size_t i = 0 ; i != result.size() ; ++i )
+	// 	{
+	// 		std::cerr << result[i].first << " , " << result[i].second << std::endl;
+	// 	}
+	// 	std::cerr << "End.\n";
+	// }
 
 	//now, once it is sorted, let us compress the result. Firstly, check how many different values we have in result.first;
 	int number_of_different_values = 0;
@@ -100,7 +102,7 @@ std::vector< std::pair<T,int> > compute_local_ECC( cub_cmplx& b , double fractio
  * This function works when no periodic boundary conditions are to be applied.
  **/
 template <typename T>
-std::vector< std::pair<T,int> > compute_local_euler_from_two_constitutive_slices_no_periodic_b_cond( const std::vector< T >& data , const std::vector< unsigned >& sizes )
+std::vector< std::pair<T,int> > compute_local_euler_from_two_constitutive_slices_no_periodic_b_cond( const std::vector<T>& data , const std::vector< unsigned >& sizes )
 {
     // auto start = high_resolution_clock::now();
     Bitmap_cubical_complex_base<T> b(sizes, data);
@@ -129,7 +131,7 @@ std::vector< std::pair<T,int> > compute_local_euler_from_two_constitutive_slices
  * NOTE: to make it work propertly all but the last element in const std::vector< bool >& dimensions_of_periodicity should be set to TRUE!!!!
  **/
 template <typename T>
-std::vector< std::pair<T,int> > compute_local_euler_from_two_constitutive_slices_periodic_b_cond( const std::vector< T >& data , const std::vector< unsigned >& sizes , const std::vector< bool >& dimensions_of_periodicity )
+std::vector< std::pair<T,int> > compute_local_euler_from_two_constitutive_slices_periodic_b_cond( const std::vector<T>& data , const std::vector< unsigned >& sizes , const std::vector< bool >& dimensions_of_periodicity )
 {
 	//be careful for periodic case!!! We should have periodic direction everywhere except from the direction where complex has thickness 2.
 		// auto start = high_resolution_clock::now();
@@ -236,18 +238,18 @@ void store_output( const std::vector< std::pair<T,int> >& ecc , const char* file
 
 
 
-std::vector< std::pair<double,int> >
-specialization_double_compute_local_euler_from_two_constitutive_slices_no_periodic_b_cond( const std::vector< double >& data ,
+std::vector< std::pair<std::vector< double >,int> >
+specialization_double_compute_local_euler_from_two_constitutive_slices_no_periodic_b_cond( const std::vector< std::vector< double > >& data ,
 	                                                                                         const std::vector< unsigned >& sizes)
 {
 	return compute_local_euler_from_two_constitutive_slices_no_periodic_b_cond( data , sizes);
 }
 
 
-std::vector< std::pair<double,int> >
-specialization_double_compute_local_euler_from_two_constitutive_slices_periodic_b_cond( const std::vector< double >& data ,
-	                                                                                      const std::vector< unsigned >& sizes,
-																																											  const std::vector< bool >& dimensions_of_periodicity )
+std::vector< std::pair<std::vector< double >,int> >
+specialization_double_compute_local_euler_from_two_constitutive_slices_periodic_b_cond( const std::vector< std::vector< double > >& data ,
+	                                                                                    const std::vector< unsigned >& sizes,
+																						const std::vector< bool >& dimensions_of_periodicity )
 {
 	return compute_local_euler_from_two_constitutive_slices_periodic_b_cond( data , sizes, dimensions_of_periodicity);
 }
@@ -257,8 +259,8 @@ PYBIND11_MODULE(_compute_local_EC_cubical, m) {
     m.doc() = "test plugin"; // optional module docstring
 
     m.def("compute_contributions_two_slices",
-		      &specialization_double_compute_local_euler_from_two_constitutive_slices_no_periodic_b_cond,
-					"specialization_double_compute_local_euler_from_two_constitutive_slices_no_periodic_b_cond");
+		&specialization_double_compute_local_euler_from_two_constitutive_slices_no_periodic_b_cond,
+		"specialization_double_compute_local_euler_from_two_constitutive_slices_no_periodic_b_cond");
 
 	m.def("compute_contributions_two_slices_PERIODIC",
 				&specialization_double_compute_local_euler_from_two_constitutive_slices_periodic_b_cond,

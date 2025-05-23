@@ -31,7 +31,10 @@ class ECC_from_pointcloud(TransformerMixin, BaseEstimator):
     n_features_ : int
         The number of features of the data passed to :meth:`fit`.
     """
-    def __init__(self, epsilon=0, max_dimension=-1, workers=1, dbg=False, measure_times=False):
+
+    def __init__(
+        self, epsilon=0, max_dimension=-1, workers=1, dbg=False, measure_times=False
+    ):
         self.epsilon = epsilon
         self.max_dimension = max_dimension
         self.workers = workers
@@ -89,11 +92,18 @@ class ECC_from_pointcloud(TransformerMixin, BaseEstimator):
             )
 
         # compute the list of local contributions to the ECC
-        (self.contributions_list, self.num_simplices_list,
-        self.largest_dimension_list,
-        self.times) = compute_local_contributions(
-            X, self.epsilon, self.max_dimension, self.workers,
-            self.dbg, self.measure_times
+        (
+            self.contributions_list,
+            self.num_simplices_list,
+            self.largest_dimension_list,
+            self.times,
+        ) = compute_local_contributions(
+            X,
+            self.epsilon,
+            self.max_dimension,
+            self.workers,
+            self.dbg,
+            self.measure_times,
         )
 
         self.num_simplices = sum(self.num_simplices_list)
@@ -118,9 +128,14 @@ class ECC_from_bitmap(TransformerMixin, BaseEstimator):
     n_features_ : int
         The number of features of the data passed to :meth:`fit`.
     """
-    def __init__(self, periodic_boundary=False, workers=1):
+
+    def __init__(
+        self, multifiltration=False, periodic_boundary=False, workers=1, chunksize=10
+    ):
+        self.multifiltration = multifiltration
         self.periodic_boundary = periodic_boundary
         self.workers = workers
+        self.chunksize = chunksize
 
     def fit(self, X, y=None):
         """A reference implementation of a fitting function for a transformer.
@@ -175,7 +190,14 @@ class ECC_from_bitmap(TransformerMixin, BaseEstimator):
         # compute the list of local contributions to the ECC
         # numpy array have the following dimension convention
         # [z,y,x] but we want it to be [x,y,z]
-        bitmap_dim = list(X.shape)
+        if not self.multifiltration:
+            # reshape, adding an axis
+            X = np.expand_dims(X, axis=-1)
+        bitmap_dim = list(X.shape)[
+            :-1
+        ]  # the last dimension is the number of filtration parameters
+        # number of filtration parameters
+        num_f = X.shape[-1]
         bitmap_dim.reverse()
 
         if type(self.periodic_boundary) is list:
@@ -188,12 +210,34 @@ class ECC_from_bitmap(TransformerMixin, BaseEstimator):
         else:
             bitmap_boundary = False
 
-        self.contributions_list = compute_cubical_contributions(top_dimensional_cells=X.flatten(order='C'),
-                                                                dimensions=bitmap_dim,
-                                                                periodic_boundary=bitmap_boundary,
-                                                                workers=2)
+        self.contributions_list = compute_cubical_contributions(
+            top_dimensional_cells=X.reshape(
+                -1, num_f, order="C"
+            ),  # flattens the pixels
+            dimensions=bitmap_dim,
+            periodic_boundary=bitmap_boundary,
+            workers=self.workers,
+            chunksize=self.chunksize,
+        )
 
-        self.number_of_simplices = sum([2*n+1 for n in X.shape])
+        self.number_of_simplices = sum([2 * n + 1 for n in X.shape])
 
-        # returns the ECC
-        return euler_characteristic_list_from_all(self.contributions_list)
+        # for the one parameter case, returns the ECC
+        # returns None in the multifiltration case
+        if self.multifiltration:
+            self.contributions_list = sorted(
+                self.contributions_list, key=lambda x: x[0]
+            )[
+                :-1
+            ]  # removes the inf
+            # can't easily compute the Euler characteristic curve
+            return None
+        else:
+            # sort the contributions lists and return the ECC
+            # convert the filtration values from tuples of lenght 1 to scalars
+            self.contributions_list = sorted(
+                [[k[0], i] for k, i in self.contributions_list], key=lambda x: x[0]
+            )[
+                :-1
+            ]  # remove the inf
+            return euler_characteristic_list_from_all(self.contributions_list)
