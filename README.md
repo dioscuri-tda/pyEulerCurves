@@ -22,7 +22,7 @@ pip install ./pyEulerCurves
 
 ## 📘 Documentation
 
-Full documentation is available on [ReadTheDocs](https://pyeulercurves.readthedocs.io).
+Full documentation is available on [Read the Docs](https://pyeulercurves.readthedocs.io).
 
 
 ## 🧪 Examples
