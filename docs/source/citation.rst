@@ -1,4 +1,4 @@
-📚 Citation
+Citation
 ==================
 If you find this package useful, please consider citing our work:
 
