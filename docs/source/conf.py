@@ -47,6 +47,7 @@ exclude_patterns = []
 autoclass_content = "both"
 
 autodoc_mock_imports = [
+    "pyEulerCurves._compute_local_EC_VR",  # mock the C++ extension
     "numpy",
     "pandas",
     "numba",
