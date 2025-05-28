@@ -6,13 +6,13 @@ __version__ = 0.2
 ext_modules = [
     Pybind11Extension(
         "pyEulerCurves._compute_local_EC_cubical",
-        ["src/compute_local_EC_cubical.cpp"],
+        ["pyEulerCurves/src/compute_local_EC_cubical.cpp"],
         define_macros=[("VERSION_INFO", __version__)],
         include_dirs=["src"],
     ),
     Pybind11Extension(
         "pyEulerCurves._compute_local_EC_VR",
-        ["src/compute_local_EC_VR.cpp"],
+        ["pyEulerCurves/src/compute_local_EC_VR.cpp"],
         define_macros=[("VERSION_INFO", __version__)],
         include_dirs=["src"],
     ),

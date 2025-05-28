@@ -1,9 +1,8 @@
 *.DS_Store
 *.ipynb_checkpoints
-*.ipynb
 pyEulerCurves.egg-info/
 build/
 *.cpython*
-pyEulerCurves/__pycache__/
+*__pycache__/
 *.whl
 *.tar.gz
