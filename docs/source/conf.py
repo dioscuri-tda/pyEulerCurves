@@ -56,6 +56,7 @@ autodoc_mock_imports = [
     "tqdm",
     "ipywidgets",
     "IPython",
+    "pyEulerCurves"
 ]
 
 # -- Options for HTML output -------------------------------------------------
