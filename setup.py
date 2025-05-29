@@ -8,13 +8,13 @@ ext_modules = [
         "pyEulerCurves._compute_local_EC_cubical",
         ["pyEulerCurves/src/compute_local_EC_cubical.cpp"],
         define_macros=[("VERSION_INFO", __version__)],
-        include_dirs=["src"],
+        include_dirs=["pyEulerCurves/src"],
     ),
     Pybind11Extension(
         "pyEulerCurves._compute_local_EC_VR",
         ["pyEulerCurves/src/compute_local_EC_VR.cpp"],
         define_macros=[("VERSION_INFO", __version__)],
-        include_dirs=["src"],
+        include_dirs=["pyEulerCurves/src"],
     ),
 ]
 
@@ -34,8 +34,9 @@ setup(
     package_data={
         "pyEulerCurves": [
             "*.py",
-            "../src/*.h",
-            "../src/*.cpp",
+            "src/*.h",
+            "src/*.cpp",
         ],  # Include header and source files
     },
+    install_requires=["numpy", "matplotlib", "scikit-learn", "pybind11>=2.10.0"],
 )
