@@ -33,16 +33,16 @@ Point Cloud Example
 .. code-block:: python
 
     import numpy as np
-    from pyEulerCurves.pointcloud import ECC_from_pointcloud
+    from pyEulerCurves import ECC_from_pointcloud
 
     # Create a simple 2D point cloud
     X = np.random.rand(100, 2)
 
     # Initialize ECC transformer
-    ecc = ECC_from_pointcloud(epsilon=0.1)
+    trans = ECC_from_pointcloud(epsilon=0.2)
 
     # Compute ECCs
-    ecc_curves = ecc.fit_transform(X)
+    ecc = trans.fit_transform(X)
 
     # ecc_curve is a list of [filtration, EC] pairs
 
@@ -52,16 +52,16 @@ Bitmap Image Example
 .. code-block:: python
 
     import numpy as np
-    from pyEulerCurves.bitmap import ECC_from_bitmap
+    from pyEulerCurves import ECC_from_bitmap
 
-    # Create a binary image
-    bitmap = np.random.randint(0, 2, size=(50, 50))
+    # Create random grayscale image
+    bitmap = np.random.randint(0, 256, size=(50, 50))
 
     # Initialize ECC transformer for cubical complex
-    ecc_bitmap = ECC_from_bitmap(periodic_boundary=False)
+    trans = ECC_from_bitmap(periodic_boundary=False)
 
     # Compute ECC
-    ecc_curve = ecc_bitmap.fit_transform(bitmap)
+    ecc = trans.fit_transform(bitmap)
 
 Visualizing the ECC
 --------------------
@@ -70,12 +70,12 @@ You can plot the Euler Characteristic Curve using the helper function:
 
 .. code-block:: python
 
-    from pyEulerCurves.utils import plot_euler_curve
+    from pyEulerCurves import plot_euler_curve
 
     import matplotlib.pyplot as plt
 
     fig, ax = plt.subplots()
-    plot_euler_curve(ecc_curve[0], this_ax=ax, with_lines=True)
+    plot_euler_curve(ecc, this_ax=ax, with_lines=True)
     plt.show()
 
 Next Steps
