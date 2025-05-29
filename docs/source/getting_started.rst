@@ -18,7 +18,7 @@ Or, if you're developing locally, clone the repository and install in editable m
 
 .. code-block:: bash
 
-    git clone https://github.com/yourusername/pyEulerCurves.git
+    git clone https://github.com/dioscuri-tda/pyEulerCurves.git
     cd pyEulerCurves
     pip install -e .
 
@@ -27,7 +27,8 @@ Basic Usage
 
 pyEulerCurves can compute Euler characteristic curves from both **point cloud** data and **bitmap images**.
 
-### Point Cloud Example
+Point Cloud Example
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -45,7 +46,8 @@ pyEulerCurves can compute Euler characteristic curves from both **point cloud** 
 
     # ecc_curve is a list of [filtration, EC] pairs
 
-### Bitmap Image Example
+Bitmap Image Example
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -84,4 +86,4 @@ Next Steps
 
 Need help? Feel free to open an issue on the GitHub repository or consult the accompanying paper for theoretical background:
 
-*Dłotko, Paweł and Gurnari, Davide. "Euler characteristic curves and profiles: a stable shape invariant for big data problems." GigaScience 12 (2023).* https://doi.org/10.1093/gigascience/giad094
+*Paweł Dłotko and Davide Gurnari. "Euler characteristic curves and profiles: a stable shape invariant for big data problems." GigaScience 12 (2023).* https://doi.org/10.1093/gigascience/giad094
