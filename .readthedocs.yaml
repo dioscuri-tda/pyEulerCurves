@@ -15,8 +15,4 @@ build:
   os: ubuntu-22.04
   tools:
     python: "3.12"
-  jobs:
-    pre_build:
-      - pip install pybind11
-      - pip install .
 
