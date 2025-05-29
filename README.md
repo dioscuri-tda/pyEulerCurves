@@ -27,7 +27,7 @@ Full documentation is available on [Read the Docs](https://pyeulercurves.readthe
 
 ## 🧪 Examples
 
-Interactive Jupyter notebooks are available in the [examples folder]([https://github.com/dioscuri-tda/pyEulerCurves](https://github.com/dioscuri-tda/pyEulerCurves/tree/master/docs/source/examples)).
+Interactive Jupyter notebooks are available in the [examples folder](https://github.com/dioscuri-tda/pyEulerCurves/tree/master/docs/source/examples).
 
 
 
