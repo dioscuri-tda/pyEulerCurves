@@ -38,5 +38,11 @@ setup(
             "src/*.cpp",
         ],  # Include header and source files
     },
-    install_requires=["numpy", "matplotlib", "scikit-learn", "pybind11>=2.10.0"],
+    install_requires=[
+        "numpy",
+        "matplotlib",
+        "scikit-learn",
+        "pybind11>=2.10.0",
+        "gudhi",
+    ],
 )
