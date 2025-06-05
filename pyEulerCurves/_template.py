@@ -8,7 +8,10 @@ from sklearn.utils.validation import check_array, check_is_fitted
 
 import matplotlib.pyplot as plt
 
-from .ecc_VR import compute_local_contributions
+from .ecc_pointcloud import (
+    compute_local_contributions_VR,
+    compute_local_contributions_alpha,
+)
 from .ecc_cubical import compute_cubical_contributions
 from .ecc_utils import euler_characteristic_list_from_all
 
@@ -16,7 +19,7 @@ from .ecc_utils import euler_characteristic_list_from_all
 class ECC_from_pointcloud(TransformerMixin, BaseEstimator):
     """
     Transformer that computes Euler Characteristic Curves (ECCs) from a point cloud
-    using Vietoris-Rips filtrations.
+    using Vietoris-Rips or Alpha filtrations.
 
     This transformer is compatible with scikit-learn pipelines and computes local
     contributions to the Euler characteristic, assembling them into a global ECC.
@@ -32,6 +35,10 @@ class ECC_from_pointcloud(TransformerMixin, BaseEstimator):
 
     workers : int, default=1
         Number of worker processes to use in parallel computation.
+
+    complex_type : {'VR', 'alpha'}, default='VR'
+        Type of simplicial complex used for ECC computation. Use 'VR' for Vietoris-Rips
+        and 'alpha' for Alpha complex.
 
     dbg : bool, default=False
         If True, enables debug output for internal steps.
@@ -61,7 +68,13 @@ class ECC_from_pointcloud(TransformerMixin, BaseEstimator):
     """
 
     def __init__(
-        self, epsilon=0, max_dimension=-1, workers=1, dbg=False, measure_times=False
+        self,
+        epsilon=0,
+        max_dimension=-1,
+        workers=1,
+        complex_type="VR",
+        dbg=False,
+        measure_times=False,
     ):
         """
         Initialize the ECC_from_pointcloud transformer.
@@ -77,6 +90,10 @@ class ECC_from_pointcloud(TransformerMixin, BaseEstimator):
         workers : int, default=1
             Number of parallel workers.
 
+        complex_type : {'VR', 'alpha'}, default='VR'
+            Type of simplicial complex used to compute ECCs. Choose 'VR' for Vietoris-Rips
+            or 'alpha' for Alpha complex.
+
         dbg : bool, default=False
             Enable debug output.
 
@@ -85,6 +102,14 @@ class ECC_from_pointcloud(TransformerMixin, BaseEstimator):
         """
         self.epsilon = epsilon
         self.max_dimension = max_dimension
+        if complex_type not in ("VR", "alpha"):
+            raise ValueError(
+                "Invalid complex_type: {}. Must be 'VR' or 'alpha'.".format(
+                    complex_type
+                )
+            )
+
+        self.complex_type = complex_type
         self.workers = workers
         self.dbg = dbg
         self.measure_times = measure_times
@@ -143,21 +168,33 @@ class ECC_from_pointcloud(TransformerMixin, BaseEstimator):
             )
 
         # compute the list of local contributions to the ECC
-        (
-            self.contributions_list,
-            self.num_simplices_list,
-            self.largest_dimension_list,
-            self.times,
-        ) = compute_local_contributions(
-            X,
-            self.epsilon,
-            self.max_dimension,
-            self.workers,
-            self.dbg,
-            self.measure_times,
-        )
+        if self.complex_type == "VR":
+            (
+                self.contributions_list,
+                self.num_simplices_list,
+                self.largest_dimension_list,
+                self.times,
+            ) = compute_local_contributions_VR(
+                X,
+                self.epsilon,
+                self.max_dimension,
+                self.workers,
+                self.dbg,
+                self.measure_times,
+            )
+            self.num_simplices = sum(self.num_simplices_list)
 
-        self.num_simplices = sum(self.num_simplices_list)
+        elif self.complex_type == "alpha":
+            self.contributions_list, self.num_simplices = (
+                compute_local_contributions_alpha(X, self.dbg)
+            )
+
+        else:
+            raise ValueError(
+                "Invalid complex_type: {}. Must be 'VR' or 'alpha'.".format(
+                    self.complex_type
+                )
+            )
 
         # returns the ECC
         return euler_characteristic_list_from_all(self.contributions_list)
