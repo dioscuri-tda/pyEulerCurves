@@ -4,10 +4,22 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
-
 # given the ordered list of local contributions
 # returns a list of tuples (filtration, euler characteristic)
 def euler_characteristic_list_from_all(local_contributions):
+    """
+    Construct the Euler Characteristic Curve (ECC) from local contributions.
+
+    Parameters
+    ----------
+    local_contributions : list of [float, int]
+        A sorted list of pairs where each element is a [filtration_value, contribution].
+
+    Returns
+    -------
+    ecc : list of [float, int]
+        List of [filtration, Euler characteristic] values forming the ECC.
+    """
 
     euler_characteristic = []
     old_f, current_characteristic = local_contributions[0]
@@ -22,7 +34,7 @@ def euler_characteristic_list_from_all(local_contributions):
     # add last contribution
     if len(local_contributions) > 1:
         euler_characteristic.append([filtration, current_characteristic])
-        
+
     if len(local_contributions) == 1:
         euler_characteristic.append(local_contributions[0])
 
@@ -35,6 +47,28 @@ def euler_characteristic_list_from_all(local_contributions):
 # WARNING
 # when plotting a lot of points, drawing the lines can take some time
 def plot_euler_curve(e_list, this_ax=None, with_lines=False, **kwargs):
+    """
+    Plot an Euler Characteristic Curve (ECC).
+
+    Parameters
+    ----------
+    e_list : list of [float, int]
+        The ECC to plot, as a list of [filtration, Euler characteristic] pairs.
+
+    this_ax : matplotlib.axes.Axes, optional
+        Axes object to draw the plot onto. If None, uses current Axes.
+
+    with_lines : bool, default=False
+        If True, draws step-style horizontal and vertical lines between points.
+
+    **kwargs : dict
+        Additional keyword arguments passed to matplotlib scatter.
+
+    Returns
+    -------
+    this_ax : matplotlib.axes.Axes
+        The matplotlib axes containing the plot.
+    """
 
     if this_ax == None:
         this_ax = plt.gca()
@@ -56,12 +90,25 @@ def plot_euler_curve(e_list, this_ax=None, with_lines=False, **kwargs):
     return this_ax
 
 
-
-
-
 # given the list of changes to the EC and a filtration value
 # returns the EC at that filtration value
 def EC_at_filtration(ecc_list, f):
+    """
+    Compute the Euler characteristic at a given filtration value.
+
+    Parameters
+    ----------
+    ecc_list : list of [float, int]
+        The ECC list as [filtration, Euler characteristic] pairs.
+
+    f : float
+        The filtration value to evaluate at.
+
+    Returns
+    -------
+    ec : int
+        Euler characteristic at the specified filtration.
+    """
 
     ec = ecc_list[0][1]
 
@@ -75,8 +122,30 @@ def EC_at_filtration(ecc_list, f):
 
 # computes the difference between two ECC from 0 to a max filtration value
 def difference_ECC(ecc1, ecc2, max_f):
+    """
+    Compute the L1 distance between two Euler Characteristic Curves (ECCs)
+    up to a maximum filtration value.
+
+    Parameters
+    ----------
+    ecc1 : list of [float, int]
+        First ECC as a list of [filtration, EC].
+
+    ecc2 : list of [float, int]
+        Second ECC as a list of [filtration, EC].
+
+    max_f : float
+        The maximum filtration value to consider.
+
+    Returns
+    -------
+    difference : float
+        The total L1 distance between the two ECCs over [0, max_f].
+    """
     # find full list of filtration points
-    filtration_steps = list(set(([f[0] for f in ecc1] + [f[0] for f in ecc2] + [max_f])))
+    filtration_steps = list(
+        set(([f[0] for f in ecc1] + [f[0] for f in ecc2] + [max_f]))
+    )
     filtration_steps.sort()
 
     difference = 0
@@ -85,15 +154,12 @@ def difference_ECC(ecc1, ecc2, max_f):
         if filtration_steps[i] > max_f:
             break
 
-        ec_1 = EC_at_filtration(ecc1, filtration_steps[i-1])
-        ec_2 = EC_at_filtration(ecc2, filtration_steps[i-1])
+        ec_1 = EC_at_filtration(ecc1, filtration_steps[i - 1])
+        ec_2 = EC_at_filtration(ecc2, filtration_steps[i - 1])
 
-        difference += abs(ec_1 - ec_2) * (filtration_steps[i] - filtration_steps[i-1])
+        difference += abs(ec_1 - ec_2) * (filtration_steps[i] - filtration_steps[i - 1])
 
     return difference
-
-
-
 
 
 # # given a distance matrix between two pointclouds
