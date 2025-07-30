@@ -15,7 +15,7 @@ using namespace std::chrono;
 
 //the main engine to do the computations
 template< typename cub_cmplx , typename T>
-std::vector< std::pair<T,int> > compute_local_ECC( cub_cmplx& b , double fraction_of_initial_elements_to_consider )
+std::vector< std::pair<T,int> > compute_local_ECC( cub_cmplx& b , double fraction_of_initial_elements_to_consider, unsigned int num_layers = 2  )
 {
 	bool dbg = false;
 
@@ -23,8 +23,10 @@ std::vector< std::pair<T,int> > compute_local_ECC( cub_cmplx& b , double fractio
 
 	//we assume here that we have two layers of top dimensional cells. That gives five slices in this direction.
     //In total we have b.size() elements. We need filtration and dimension of the initial 2/5 of them.
-    unsigned lower_bound = (unsigned)( 2*fraction_of_initial_elements_to_consider*b.size() );
-    unsigned upper_bound = (unsigned)( 4*fraction_of_initial_elements_to_consider*b.size() );
+    unsigned lower_bound = (unsigned)( fraction_of_initial_elements_to_consider*b.size() );
+	unsigned upper_bound = (unsigned)( lower_bound + (num_layers-1)*2*fraction_of_initial_elements_to_consider*b.size() );
+
+    // unsigned upper_bound = (unsigned)( 2*num_layers*fraction_of_initial_elements_to_consider*b.size() );
     if ( dbg )
     {
 		std::cerr << "b.size() : " << b.size() << std::endl;
@@ -121,6 +123,43 @@ std::vector< std::pair<T,int> > compute_local_euler_from_two_constitutive_slices
     // std::cout << "Computaion of ECC : " << duration.count() << std::endl;
     return lecc;
 }//compute_local_euler_from_two_constitutive_slices
+
+
+
+
+
+/**
+ * function to interface in non-periodic case
+ * This function take N filtration on maximal cells in N constitutive slices of a cubical complex. It costruct it, and compute Euler Characteristic Curve (ECC) of the
+ * first N-1 layers, withouth the upper part. See a picture in the publication.
+ * This function works when no periodic boundary conditions are to be applied.
+ **/
+template <typename T>
+std::vector< std::pair<T,int> > compute_local_euler_from_N_constitutive_slices_no_periodic_b_cond( const std::vector<T>& data , const std::vector< unsigned >& sizes )
+{
+    // auto start = high_resolution_clock::now();
+    Bitmap_cubical_complex_base<T> b(sizes, data);
+    // auto stop = high_resolution_clock::now();
+    // auto duration = duration_cast<seconds>(stop - start);
+    // std::cout << "Creation of a bitmap : " << duration.count() << std::endl;
+		//
+    // std::cerr << "b.size() : " << b.size() << std::endl;
+
+    //in non periodic case every complex that has N layers of cubes in its last dimensions will have 2N+1 layers in the whole bitmap (draw 2d example to see it)
+    double fraction_of_initial_elements_to_consider = 1./ (2*sizes.back()+1);
+
+	// std::cerr << "fraction_of_initial_elements_to_consider : " << 2*sizes.back()+1 << std::endl;
+    // start = high_resolution_clock::now();
+    std::vector< std::pair<T,int> > lecc = compute_local_ECC< Bitmap_cubical_complex_base<T> , T >( b , fraction_of_initial_elements_to_consider, sizes.back() );
+    // stop = high_resolution_clock::now();
+    // duration = duration_cast<seconds>(stop - start);
+    // std::cout << "Computaion of ECC : " << duration.count() << std::endl;
+    return lecc;
+}//compute_local_euler_from_two_constitutive_slices
+
+
+
+
 
 
 /**
@@ -239,11 +278,18 @@ void store_output( const std::vector< std::pair<T,int> >& ecc , const char* file
 
 
 std::vector< std::pair<std::vector< double >,int> >
-specialization_double_compute_local_euler_from_two_constitutive_slices_no_periodic_b_cond( const std::vector< std::vector< double > >& data ,
-	                                                                                         const std::vector< unsigned >& sizes)
+specialization_double_compute_local_euler_from_two_constitutive_slices_no_periodic_b_cond( const std::vector< std::vector< double > >& data , const std::vector< unsigned >& sizes)
 {
-	return compute_local_euler_from_two_constitutive_slices_no_periodic_b_cond( data , sizes);
+	return compute_local_euler_from_two_constitutive_slices_no_periodic_b_cond(data, sizes);
 }
+
+
+std::vector< std::pair<std::vector< double >,int> >
+specialization_double_compute_local_euler_from_N_constitutive_slices_no_periodic_b_cond( const std::vector< std::vector< double > >& data , const std::vector< unsigned >& sizes)
+{
+	return compute_local_euler_from_N_constitutive_slices_no_periodic_b_cond(data, sizes);
+}
+
 
 
 std::vector< std::pair<std::vector< double >,int> >
@@ -261,6 +307,10 @@ PYBIND11_MODULE(_compute_local_EC_cubical, m) {
     m.def("compute_contributions_two_slices",
 		&specialization_double_compute_local_euler_from_two_constitutive_slices_no_periodic_b_cond,
 		"specialization_double_compute_local_euler_from_two_constitutive_slices_no_periodic_b_cond");
+
+	m.def("compute_contributions_N_slices",
+		&specialization_double_compute_local_euler_from_N_constitutive_slices_no_periodic_b_cond,
+		"specialization_double_compute_local_euler_from_N_constitutive_slices_no_periodic_b_cond");
 
 	m.def("compute_contributions_two_slices_PERIODIC",
 				&specialization_double_compute_local_euler_from_two_constitutive_slices_periodic_b_cond,

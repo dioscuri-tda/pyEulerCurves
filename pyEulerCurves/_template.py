@@ -239,12 +239,20 @@ class ECC_from_bitmap(TransformerMixin, BaseEstimator):
     """
 
     def __init__(
-        self, multifiltration=False, periodic_boundary=False, workers=1, chunksize=10
+        self,
+        multifiltration=False,
+        periodic_boundary=False,
+        workers=1,
+        slicesize=2,
+        chunksize=10,
+        OLD=True,
     ):
         self.multifiltration = multifiltration
         self.periodic_boundary = periodic_boundary
         self.workers = workers
+        self.slicesize = slicesize
         self.chunksize = chunksize
+        self.OLD = OLD
 
     def fit(self, X, y=None):
         """
@@ -340,7 +348,9 @@ class ECC_from_bitmap(TransformerMixin, BaseEstimator):
             dimensions=bitmap_dim,
             periodic_boundary=bitmap_boundary,
             workers=self.workers,
+            slicesize=self.slicesize,
             chunksize=self.chunksize,
+            OLD=self.OLD,
         )
 
         self.number_of_simplices = sum([2 * n + 1 for n in X.shape])
@@ -350,17 +360,14 @@ class ECC_from_bitmap(TransformerMixin, BaseEstimator):
         if self.multifiltration:
             self.contributions_list = sorted(
                 self.contributions_list, key=lambda x: x[0]
-            )[
-                :-1
-            ]  # removes the inf
+            )
             # can't easily compute the Euler characteristic curve
+            # just store the list of contributions in self.contributions_list
             return None
         else:
             # sort the contributions lists and return the ECC
             # convert the filtration values from tuples of lenght 1 to scalars
             self.contributions_list = sorted(
                 [[k[0], i] for k, i in self.contributions_list], key=lambda x: x[0]
-            )[
-                :-1
-            ]  # remove the inf
+            )
             return euler_characteristic_list_from_all(self.contributions_list)
