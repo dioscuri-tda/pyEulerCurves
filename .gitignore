@@ -6,3 +6,5 @@ build/
 *__pycache__/
 *.whl
 *.tar.gz
+.vscode/
+docs/source/examples/ecp_dist
