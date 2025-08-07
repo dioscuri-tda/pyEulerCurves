@@ -1,7 +1,11 @@
 from setuptools import setup, find_packages
 from pybind11.setup_helpers import Pybind11Extension, build_ext
 
+<<<<<<< HEAD
 __version__ = "0.5"
+=======
+__version__ = "0.2.5"
+>>>>>>> master
 
 ext_modules = [
     Pybind11Extension(
@@ -9,11 +13,14 @@ ext_modules = [
         ["pyEulerCurves/src/compute_local_EC_cubical.cpp"],
         define_macros=[("VERSION_INFO", __version__)],
         include_dirs=["pyEulerCurves/src"],
+        include_dirs=["pyEulerCurves/src"],
     ),
     Pybind11Extension(
         "pyEulerCurves._compute_local_EC_VR",
         ["pyEulerCurves/src/compute_local_EC_VR.cpp"],
+        ["pyEulerCurves/src/compute_local_EC_VR.cpp"],
         define_macros=[("VERSION_INFO", __version__)],
+        include_dirs=["pyEulerCurves/src"],
         include_dirs=["pyEulerCurves/src"],
     ),
 ]

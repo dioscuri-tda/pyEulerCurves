@@ -5,9 +5,15 @@ This is a module to be used as a reference for building other modules
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_array, check_is_fitted
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.utils.validation import check_array, check_is_fitted
 
 import matplotlib.pyplot as plt
 
+from .ecc_pointcloud import (
+    compute_local_contributions_VR,
+    compute_local_contributions_alpha,
+)
 from .ecc_pointcloud import (
     compute_local_contributions_VR,
     compute_local_contributions_alpha,
@@ -20,12 +26,34 @@ class ECC_from_pointcloud(TransformerMixin, BaseEstimator):
     """
     Transformer that computes Euler Characteristic Curves (ECCs) from a point cloud
     using Vietoris-Rips or Alpha filtrations.
+    """
+    Transformer that computes Euler Characteristic Curves (ECCs) from a point cloud
+    using Vietoris-Rips or Alpha filtrations.
 
     This transformer is compatible with scikit-learn pipelines and computes local
     contributions to the Euler characteristic, assembling them into a global ECC.
 
     Parameters
     ----------
+    epsilon : float, default=0
+        Threshold parameter for Vietoris-Rips filtration. Controls the scale at which
+        simplices are created.
+
+    max_dimension : int, default=-1
+        Maximum homology dimension to consider. If set to -1, all dimensions are used.
+
+    workers : int, default=1
+        Number of worker processes to use in parallel computation.
+
+    complex_type : {'VR', 'alpha'}, default='VR'
+        Type of simplicial complex used for ECC computation. Use 'VR' for Vietoris-Rips
+        and 'alpha' for Alpha complex.
+
+    dbg : bool, default=False
+        If True, enables debug output for internal steps.
+
+    measure_times : bool, default=False
+        If True, records timing information for different steps of the computation.
     epsilon : float, default=0
         Threshold parameter for Vietoris-Rips filtration. Controls the scale at which
         simplices are created.
@@ -100,8 +128,50 @@ class ECC_from_pointcloud(TransformerMixin, BaseEstimator):
         measure_times : bool, default=False
             Enable timing measurement.
         """
+
+    def __init__(
+        self,
+        epsilon=0,
+        max_dimension=-1,
+        workers=1,
+        complex_type="VR",
+        dbg=False,
+        measure_times=False,
+    ):
+        """
+        Initialize the ECC_from_pointcloud transformer.
+
+        Parameters
+        ----------
+        epsilon : float, default=0
+            Vietoris-Rips filtration scale parameter.
+
+        max_dimension : int, default=-1
+            Maximum homology dimension to consider.
+
+        workers : int, default=1
+            Number of parallel workers.
+
+        complex_type : {'VR', 'alpha'}, default='VR'
+            Type of simplicial complex used to compute ECCs. Choose 'VR' for Vietoris-Rips
+            or 'alpha' for Alpha complex.
+
+        dbg : bool, default=False
+            Enable debug output.
+
+        measure_times : bool, default=False
+            Enable timing measurement.
+        """
         self.epsilon = epsilon
         self.max_dimension = max_dimension
+        if complex_type not in ("VR", "alpha"):
+            raise ValueError(
+                "Invalid complex_type: {}. Must be 'VR' or 'alpha'.".format(
+                    complex_type
+                )
+            )
+
+        self.complex_type = complex_type
         if complex_type not in ("VR", "alpha"):
             raise ValueError(
                 "Invalid complex_type: {}. Must be 'VR' or 'alpha'.".format(
@@ -117,19 +187,25 @@ class ECC_from_pointcloud(TransformerMixin, BaseEstimator):
     def fit(self, X, y=None):
         """
         Fit the transformer on input data `X`.
+        """
+        Fit the transformer on input data `X`.
 
         Parameters
         ----------
         X : {array-like, sparse matrix}, shape (n_samples, n_features)
             The training input samples.
 
+
         y : None
+            Ignored. This parameter exists for compatibility with
+            scikit-learn pipelines.
             Ignored. This parameter exists for compatibility with
             scikit-learn pipelines.
 
         Returns
         -------
         self : object
+            Fitted transformer.
             Fitted transformer.
         """
         X = check_array(X, accept_sparse=True, allow_nd=True)
@@ -142,14 +218,21 @@ class ECC_from_pointcloud(TransformerMixin, BaseEstimator):
     def transform(self, X):
         """
         Compute the Euler Characteristic Curve (ECC) for the given point cloud(s).
+        """
+        Compute the Euler Characteristic Curve (ECC) for the given point cloud(s).
 
         Parameters
         ----------
         X : {array-like, sparse matrix}, shape (n_samples, n_features)
             The input point cloud data. Each row corresponds to a single point cloud.
+        X : {array-like, sparse matrix}, shape (n_samples, n_features)
+            The input point cloud data. Each row corresponds to a single point cloud.
 
         Returns
         -------
+        ecc : list of [float, int]
+            A list of `[filtration_value, Euler_characteristic]` pairs representing
+            the Euler Characteristic Curve computed from the entire dataset.
         ecc : list of [float, int]
             A list of `[filtration_value, Euler_characteristic]` pairs representing
             the Euler Characteristic Curve computed from the entire dataset.
@@ -183,6 +266,33 @@ class ECC_from_pointcloud(TransformerMixin, BaseEstimator):
                 self.measure_times,
             )
             self.num_simplices = sum(self.num_simplices_list)
+        if self.complex_type == "VR":
+            (
+                self.contributions_list,
+                self.num_simplices_list,
+                self.largest_dimension_list,
+                self.times,
+            ) = compute_local_contributions_VR(
+                X,
+                self.epsilon,
+                self.max_dimension,
+                self.workers,
+                self.dbg,
+                self.measure_times,
+            )
+            self.num_simplices = sum(self.num_simplices_list)
+
+        elif self.complex_type == "alpha":
+            self.contributions_list, self.num_simplices = (
+                compute_local_contributions_alpha(X, self.dbg)
+            )
+
+        else:
+            raise ValueError(
+                "Invalid complex_type: {}. Must be 'VR' or 'alpha'.".format(
+                    self.complex_type
+                )
+            )
 
         elif self.complex_type == "alpha":
             self.contributions_list, self.num_simplices = (
@@ -266,10 +376,13 @@ class ECC_from_bitmap(TransformerMixin, BaseEstimator):
         y : None
             Ignored. This parameter exists for compatibility with
             scikit-learn pipelines.
+            Ignored. This parameter exists for compatibility with
+            scikit-learn pipelines.
 
         Returns
         -------
         self : object
+            Fitted transformer.
             Fitted transformer.
         """
         X = check_array(X, accept_sparse=True, allow_nd=True)
@@ -353,6 +466,7 @@ class ECC_from_bitmap(TransformerMixin, BaseEstimator):
             OLD=self.OLD,
         )
 
+        self.number_of_simplices = sum([2 * n + 1 for n in X.shape])
         self.number_of_simplices = sum([2 * n + 1 for n in X.shape])
 
         # for the one parameter case, returns the ECC
