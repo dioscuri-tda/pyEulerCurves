@@ -7,5 +7,4 @@ build/
 *.whl
 *.tar.gz
 .vscode/
-docs/source/examples/data/hopf/
 docs/source/examples/ecp_dist
