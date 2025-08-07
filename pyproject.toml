@@ -4,7 +4,8 @@ requires = [
     "pybind11>=2.10.0",
     "numpy",
     "scikit-learn",
-    "matplotlib"
+    "matplotlib",
+    "numba"
 ]
 build-backend = "setuptools.build_meta"
 
