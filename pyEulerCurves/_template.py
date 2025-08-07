@@ -26,9 +26,6 @@ class ECC_from_pointcloud(TransformerMixin, BaseEstimator):
     """
     Transformer that computes Euler Characteristic Curves (ECCs) from a point cloud
     using Vietoris-Rips or Alpha filtrations.
-    """
-    Transformer that computes Euler Characteristic Curves (ECCs) from a point cloud
-    using Vietoris-Rips or Alpha filtrations.
 
     This transformer is compatible with scikit-learn pipelines and computes local
     contributions to the Euler characteristic, assembling them into a global ECC.
@@ -187,8 +184,6 @@ class ECC_from_pointcloud(TransformerMixin, BaseEstimator):
     def fit(self, X, y=None):
         """
         Fit the transformer on input data `X`.
-        """
-        Fit the transformer on input data `X`.
 
         Parameters
         ----------
@@ -216,8 +211,6 @@ class ECC_from_pointcloud(TransformerMixin, BaseEstimator):
         return self
 
     def transform(self, X):
-        """
-        Compute the Euler Characteristic Curve (ECC) for the given point cloud(s).
         """
         Compute the Euler Characteristic Curve (ECC) for the given point cloud(s).
 
@@ -281,18 +274,6 @@ class ECC_from_pointcloud(TransformerMixin, BaseEstimator):
                 self.measure_times,
             )
             self.num_simplices = sum(self.num_simplices_list)
-
-        elif self.complex_type == "alpha":
-            self.contributions_list, self.num_simplices = (
-                compute_local_contributions_alpha(X, self.dbg)
-            )
-
-        else:
-            raise ValueError(
-                "Invalid complex_type: {}. Must be 'VR' or 'alpha'.".format(
-                    self.complex_type
-                )
-            )
 
         elif self.complex_type == "alpha":
             self.contributions_list, self.num_simplices = (
