@@ -56,11 +56,12 @@ def plot_ECP_NEW(
         this_ax = plt.gca()
 
     Z, f1_list, f2_list = create_ecp_grid(contributions, dims, verbose)
+    Z = Z.T  # for compatibility with pcolormesh
 
     print(Z.shape, len(f1_list), len(f2_list))
 
     # Plotting
-    im = this_ax.pcolormesh(f1_list, f2_list, Z[:-1, :-1].T, **kwargs)
+    im = this_ax.pcolormesh(f1_list, f2_list, Z[:-1, :-1], **kwargs)
 
     this_ax.set_xlabel("Filtration 1")
     this_ax.set_ylabel("Filtration 2")
@@ -68,7 +69,7 @@ def plot_ECP_NEW(
     if colorbar:
         plt.colorbar(im, ax=this_ax)
 
-    return this_ax
+    return this_ax, Z, f1_list, f2_list
 
 
 #################
@@ -83,7 +84,7 @@ def EC_at_bifiltration(contributions, f1, f2):
 def plot_ECP_OLD(contributions, dims, this_ax=None, colorbar=False, **kwargs):
 
     f1min, f1max = dims[0]
-    f2min, f2max = dims[0]
+    f2min, f2max = dims[1]
 
     if this_ax == None:
         this_ax = plt.gca()
@@ -91,16 +92,16 @@ def plot_ECP_OLD(contributions, dims, this_ax=None, colorbar=False, **kwargs):
     f1_list = [f1min] + sorted(set([c[0][0] for c in contributions])) + [f1max]
     f2_list = [f2min] + sorted(set([c[0][1] for c in contributions])) + [f2max]
 
-    Z = np.zeros((len(f2_list) - 1, len(f1_list) - 1))
+    Z = np.zeros((len(f2_list), len(f1_list)))
 
     print(Z.shape, len(f1_list), len(f2_list))
 
-    for i, f1 in enumerate(f1_list[:-1]):
-        for j, f2 in enumerate(f2_list[:-1]):
+    for i, f1 in enumerate(f1_list):
+        for j, f2 in enumerate(f2_list):
             Z[j, i] = EC_at_bifiltration(contributions, f1, f2)
 
     # Plotting
-    im = this_ax.pcolormesh(f1_list, f2_list, Z, **kwargs)
+    im = this_ax.pcolormesh(f1_list, f2_list, Z[:-1, :-1], **kwargs)
 
     this_ax.set_xlabel("Filtration 1")
     this_ax.set_ylabel("Filtration 2")
@@ -108,4 +109,4 @@ def plot_ECP_OLD(contributions, dims, this_ax=None, colorbar=False, **kwargs):
     if colorbar:
         plt.colorbar(im, ax=this_ax)
 
-    return this_ax
+    return this_ax, Z, f1_list, f2_list
