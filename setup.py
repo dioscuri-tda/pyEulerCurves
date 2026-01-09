@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 from pybind11.setup_helpers import Pybind11Extension, build_ext
 
-__version__ = "0.5.post"
+__version__ = "0.6"
 
 ext_modules = [
     Pybind11Extension(
