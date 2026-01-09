@@ -1,9 +1,11 @@
-import numpy as np
 import itertools
-from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor
 from timeit import default_timer
-from ._compute_local_EC_VR import compute_contributions_vertex
+
 import gudhi as gd
+import numpy as np
+
+from ._compute_local_EC_VR import compute_contributions_vertex
 
 ################################
 ## Vietoris-Rips construction ##

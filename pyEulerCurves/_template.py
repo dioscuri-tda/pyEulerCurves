@@ -5,21 +5,13 @@ This is a module to be used as a reference for building other modules
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_array, check_is_fitted
-from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils.validation import check_array, check_is_fitted
 
-import matplotlib.pyplot as plt
-
-from .ecc_pointcloud import (
-    compute_local_contributions_VR,
-    compute_local_contributions_alpha,
-)
-from .ecc_pointcloud import (
-    compute_local_contributions_VR,
-    compute_local_contributions_alpha,
-)
-from .ecc_cubical import compute_cubical_contributions
+from .cubical import compute_cubical_contributions
 from .ecc_utils import euler_characteristic_list_from_all
+from .vietorisRips import (
+    compute_local_contributions_alpha,
+    compute_local_contributions_VR,
+)
 
 
 class ECC_from_pointcloud(TransformerMixin, BaseEstimator):
@@ -91,40 +83,6 @@ class ECC_from_pointcloud(TransformerMixin, BaseEstimator):
     num_simplices : int
         Total number of simplices.
     """
-
-    def __init__(
-        self,
-        epsilon=0,
-        max_dimension=-1,
-        workers=1,
-        complex_type="VR",
-        dbg=False,
-        measure_times=False,
-    ):
-        """
-        Initialize the ECC_from_pointcloud transformer.
-
-        Parameters
-        ----------
-        epsilon : float, default=0
-            Vietoris-Rips filtration scale parameter.
-
-        max_dimension : int, default=-1
-            Maximum homology dimension to consider.
-
-        workers : int, default=1
-            Number of parallel workers.
-
-        complex_type : {'VR', 'alpha'}, default='VR'
-            Type of simplicial complex used to compute ECCs. Choose 'VR' for Vietoris-Rips
-            or 'alpha' for Alpha complex.
-
-        dbg : bool, default=False
-            Enable debug output.
-
-        measure_times : bool, default=False
-            Enable timing measurement.
-        """
 
     def __init__(
         self,

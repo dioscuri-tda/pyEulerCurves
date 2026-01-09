@@ -1,6 +1,8 @@
-import numpy as np
 import itertools
-from numba import njit, jit
+from collections import defaultdict
+
+import numpy as np
+from numba import njit
 
 
 #######################################
@@ -451,7 +453,7 @@ def compute_difference_3d(ext, X_list, Y_list, Z_list):
 
 def difference_ECP(ecp_1, ecp_2, dims, verbose=False):
     """
-    Compute the L1 difference between two Empirical Contribution Profiles (ECPs)
+    Compute the L1 difference between two Euler Characteristic Profiles (ECPs)
     over a given multi-dimensional space.
 
     This function automatically selects an optimized method based on the number of
@@ -607,9 +609,6 @@ def compute_difference_nd(ext, coord_lists):
         total += abs(val * volume)
 
     return total
-
-
-from collections import defaultdict
 
 
 def discretize_contributions(contributions, dims, resolution, verbose=False):

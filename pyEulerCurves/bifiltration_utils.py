@@ -1,7 +1,6 @@
-import numpy as np
-from numba import njit, jit
-
 import matplotlib.pyplot as plt
+import numpy as np
+from numba import njit
 
 
 def create_ecp_grid(contributions, dims, verbose=False):
@@ -48,11 +47,11 @@ def compute_prefix_sum_2d(grid):
     return ext
 
 
-def plot_ECP_NEW(
+def plot_ECP(
     contributions, dims, this_ax=None, colorbar=False, verbose=False, **kwargs
 ):
 
-    if this_ax == None:
+    if this_ax is None:
         this_ax = plt.gca()
 
     Z, f1_list, f2_list = create_ecp_grid(contributions, dims, verbose)
@@ -72,41 +71,5 @@ def plot_ECP_NEW(
     return this_ax, Z, f1_list, f2_list
 
 
-#################
-# OLD FUNCTIONS #
-#################
-
-
 def EC_at_bifiltration(contributions, f1, f2):
     return sum([c[1] for c in contributions if (c[0][0] <= f1) and (c[0][1] <= f2)])
-
-
-def plot_ECP_OLD(contributions, dims, this_ax=None, colorbar=False, **kwargs):
-
-    f1min, f1max = dims[0]
-    f2min, f2max = dims[1]
-
-    if this_ax == None:
-        this_ax = plt.gca()
-
-    f1_list = [f1min] + sorted(set([c[0][0] for c in contributions])) + [f1max]
-    f2_list = [f2min] + sorted(set([c[0][1] for c in contributions])) + [f2max]
-
-    Z = np.zeros((len(f2_list), len(f1_list)))
-
-    print(Z.shape, len(f1_list), len(f2_list))
-
-    for i, f1 in enumerate(f1_list):
-        for j, f2 in enumerate(f2_list):
-            Z[j, i] = EC_at_bifiltration(contributions, f1, f2)
-
-    # Plotting
-    im = this_ax.pcolormesh(f1_list, f2_list, Z[:-1, :-1], **kwargs)
-
-    this_ax.set_xlabel("Filtration 1")
-    this_ax.set_ylabel("Filtration 2")
-
-    if colorbar:
-        plt.colorbar(im, ax=this_ax)
-
-    return this_ax, Z, f1_list, f2_list

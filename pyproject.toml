@@ -1,27 +1,56 @@
 [build-system]
 requires = [
-    "setuptools>=42",
+    "setuptools>=61.0",
+    "wheel",
     "pybind11>=2.10.0",
-    "numpy",
-    "scikit-learn",
-    "matplotlib",
-    "numba"
 ]
 build-backend = "setuptools.build_meta"
 
-[tool.cibuildwheel]
-test-command = "python {project}/tests/test.py"
-test-skip = "*universal2:arm64"
+[project]
+name = "pyEulerCurves"
+description = "A python package to compute Euler Characteristic Curves"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "MIT"}  # adjust if needed
 
-[tool.ruff]
-extend-select = [
-  "B",   # flake8-bugbear
-  "I",   # isort
-  "PGH", # pygrep-hooks
-  "RUF", # Ruff-specific
-  "UP",  # pyupgrade
+authors = [
+    { name = "Davide Gurnari", email = "davide.gurnari@gmail.com" }
 ]
-extend-ignore = [
-  "E501",   # Line too long
+
+dependencies = [
+    "numpy",
+    "matplotlib",
+    "scikit-learn",
+    "pybind11>=2.10.0",
+    "gudhi",
+    "numba",
 ]
-target-version = "py37"
+
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/dioscuri-tda/pyEulerCurves"
+
+[tool.setuptools]
+zip-safe = false
+
+[tool.setuptools.packages.find]
+include = ["pyEulerCurves*"]
+
+[tool.setuptools.package-data]
+pyEulerCurves = [
+    "*.py",
+    "src/*.h",
+    "src/*.cpp",
+]
+
+[tool.setuptools.dynamic]
+version = { attr = "pyEulerCurves._version.__version__" }
+
+[tool.black]
+line-length = 88
+target-version = ["py312"]
+
+[tool.isort]
+profile = "black"
+line_length = 88

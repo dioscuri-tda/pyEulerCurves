@@ -1,14 +1,14 @@
-import numpy as np
 import itertools
-from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
+import time
+from concurrent.futures import ProcessPoolExecutor
+
+import numpy as np
+
 from ._compute_local_EC_cubical import (
     compute_contributions_N_slices,
     compute_contributions_two_slices,
     compute_contributions_two_slices_PERIODIC,
 )
-
-
-import time
 
 
 def compute_contributions_single_slice(slices, dim, periodic_boundary):
@@ -105,7 +105,7 @@ def compute_cubical_contributions(
         print(inputs_dims)
 
         if inputs_dims[-1][-1] == 1:
-            ## drop the last slice
+            # drop the last slice
             inputs.pop(-1)
             inputs_dims.pop(-1)
 
