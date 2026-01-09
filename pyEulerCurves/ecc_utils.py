@@ -1,6 +1,4 @@
 ## various functions
-
-import numpy as np
 from matplotlib import pyplot as plt
 
 
@@ -70,7 +68,7 @@ def plot_euler_curve(e_list, this_ax=None, with_lines=False, **kwargs):
         The matplotlib axes containing the plot.
     """
 
-    if this_ax == None:
+    if this_ax is None:
         this_ax = plt.gca()
 
     # Plotting
