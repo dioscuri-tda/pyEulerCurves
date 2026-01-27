@@ -24,4 +24,8 @@ jobs:
           pip install pre-commit
 
       - name: Run pre-commit (Black, isort, Flake8)
+<<<<<<< HEAD
         run: pre-commit run --all-files
+=======
+        run: pre-commit run --all-files
+>>>>>>> master
