@@ -63,6 +63,44 @@ Bitmap Image Example
     # Compute ECC
     ecc = trans.fit_transform(bitmap)
 
+Filtered Graph Example
+~~~~~~~~~~~~~~~~~~~~~~
+
+pyEulerCurves can also compute the Euler Characteristic Profile (ECP) of the
+flag complex of a (multi-)filtered graph. A scalar filtration is represented
+as a single float; multifiltrations use tuples of floats.
+
+.. code-block:: python
+
+    from pyEulerCurves import ECP_from_filtered_graph, FilteredGraph
+
+    graph = FilteredGraph(
+        vertex_filtrations=[(0.0, 0.0), (0.0, 0.0), (0.1, 0.0)],
+        edges=[(0, 1), (1, 2), (0, 2)],
+        edge_filtrations=[(0.2, 0.4), (0.5, 0.6), (0.7, 0.8)],
+    )
+
+    ecp = ECP_from_filtered_graph().fit_transform(graph)
+
+If NetworkX is installed, the same transformer accepts a ``networkx.Graph``
+whose nodes and edges define a ``"filtration"`` attribute.
+
+.. code-block:: python
+
+    import networkx as nx
+    from pyEulerCurves import ECP_from_filtered_graph
+
+    graph = nx.Graph()
+    graph.add_node("a", filtration=(0.0, 0.0))
+    graph.add_node("b", filtration=(0.0, 0.0))
+    graph.add_edge("a", "b", filtration=(0.25, 0.5))
+
+    ecp = ECP_from_filtered_graph().fit_transform(graph)
+
+For large graphs, many distinct floating-point filtration values can produce a
+large ECP. If you want to compute on a coarser finite filtration poset, coarsen the
+vertex and edge filtration values before constructing the ``FilteredGraph``.
+
 Visualizing the ECC
 --------------------
 

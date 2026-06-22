@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 from pybind11.setup_helpers import Pybind11Extension, build_ext
 
-__version__ = "0.6"
+__version__ = "0.6.1"
 
 ext_modules = [
     Pybind11Extension(
@@ -30,7 +30,7 @@ setup(
     ext_modules=ext_modules,
     cmdclass={"build_ext": build_ext},
     zip_safe=False,
-    python_requires=">=3.7",
+    python_requires=">=3.10",
     package_data={
         "pyEulerCurves": [
             "*.py",

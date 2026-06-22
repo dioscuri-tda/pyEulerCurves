@@ -2,7 +2,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/pyEulerCurves.svg?color=blue)](https://pypi.org/project/pyEulerCurves)
 [![Documentation Status](https://readthedocs.org/projects/pyeulercurves/badge/?version=latest)](https://pyeulercurves.readthedocs.io/en/latest/?badge=latest)
 
-**pyEulerCurves** is a Python package for computing **Euler Characteristic Curves (ECC)** from point cloud or image data. It provides an intuitive, à la scikit-learn interface and supports fast, parallel computations thanks to its C++ backend. ECCs are powerful topological signatures useful in shape analysis, computer vision, and machine learning.
+**pyEulerCurves** is a Python package for computing **Euler Characteristic Curves (ECC)** from point cloud or image data, or the **Euler Characteristic Profile (ECP)** from (multi)filtered graphs. It provides an intuitive, à la scikit-learn interface and supports fast, parallel computations thanks to its C++ backend. ECCs are powerful topological signatures useful in shape analysis, computer vision, and machine learning.
 
 
 ## 📦 Installation
